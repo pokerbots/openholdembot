@@ -213,6 +213,7 @@
     <ClCompile Include="CSymbolEngineICM.cpp" />
     <ClCompile Include="CSymbolengineIsRush.cpp" />
     <ClCompile Include="CSymbolEngineMTTInfo.cpp" />
+    <ClCompile Include="CSymbolEngineMultiplexer.cpp" />
     <ClCompile Include="CSymbolengineOpenPPL.cpp" />
     <ClCompile Include="CSymbolEnginePokerAction.cpp" />
     <ClCompile Include="CSymbolEngineRaisers.cpp" />
@@ -490,6 +491,7 @@
     <ClInclude Include="CSymbolEngineICM.h" />
     <ClInclude Include="CSymbolEngineIsRush.h" />
     <ClInclude Include="CSymbolengineMTTInfo.h" />
+    <ClInclude Include="CSymbolengineMultiplexer.h" />
     <ClInclude Include="CSymbolEngineOpenPPL.h" />
     <ClInclude Include="CSymbolEnginePokerAction.h" />
     <ClInclude Include="CSymbolEngineRaisers.h" />

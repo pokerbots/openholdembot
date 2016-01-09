@@ -49,6 +49,7 @@
 #include "CSymbolEngineIsTournament.h"
 #include "CSymbolEngineMemorySymbols.h"
 #include "CSymbolEngineMTTInfo.h"
+#include "CSymbolEngineMultiplexer.h"
 #include "CSymbolEngineOpenPPL.h"
 #include "CSymbolEngineOpenPPLHandAndBoardExpression.h"
 #include "CSymbolEngineOpenPPLUserVariables.h"
@@ -107,6 +108,9 @@ void CEngineContainer::CreateSymbolEngines() {
   // CFunctionCollection
   p_function_collection = new CFunctionCollection;
   AddSymbolEngine(p_function_collection);
+  // CSymbolEngineMultiplexer
+  p_symbol_engine_multiplexer = new CSymbolEngineMultiplexer();
+  AddSymbolEngine(p_symbol_engine_multiplexer);
   // CSymbolEngineUserchair
   p_symbol_engine_userchair = new CSymbolEngineUserchair();
   AddSymbolEngine(p_symbol_engine_userchair);
@@ -247,11 +251,11 @@ void CEngineContainer::CreateSymbolEngines() {
   write_log(preferences.debug_engine_container(), "[EngineContainer] All symbol engines created\n");
 }
 
-void CEngineContainer::DestroyAllSymbolEngines()
-{
+void CEngineContainer::DestroyAllSymbolEngines() {
 	write_log(preferences.debug_engine_container(), "[EngineContainer] Going to destroy all symbol engines\n");
-	for (int i=0; i<_number_of_symbol_engines_loaded; i++)
-	{
+  // Delete engines in revered order, 
+  // respecting engine dependencies, just in case
+	for (int i=(_number_of_symbol_engines_loaded - 1); i>=0; --i) {
 		write_log(preferences.debug_engine_container(), "[EngineContainer] Going to delete symbol engine %i\n", i);
 		delete _symbol_engines[i];
 		_symbol_engines[i] = NULL;
@@ -260,16 +264,13 @@ void CEngineContainer::DestroyAllSymbolEngines()
 	write_log(preferences.debug_engine_container(), "[EngineContainer] All symbol engines successfully destroyed\n");
 }
 
-void CEngineContainer::DestroyAllSpecialSymbolEngines()
-{
+void CEngineContainer::DestroyAllSpecialSymbolEngines() {
 	delete p_betround_calculator;
 }
 
-void CEngineContainer::EvaluateAll()
-{
+void CEngineContainer::EvaluateAll() {
 	write_log(preferences.debug_engine_container(), "[EngineContainer] EvaluateAll()\n");
-	if (!_reset_on_connection_executed)
-	{
+	if (!_reset_on_connection_executed)	{
 		write_log(preferences.debug_engine_container(), "[EngineContainer] Skipping as ResetOnConnection not yet executed.\n");
 		write_log(preferences.debug_engine_container(), "[EngineContainer] Waiting for call by auto-connector-thread\n");
 		// The problem with ResetOnConnection:
@@ -298,56 +299,46 @@ void CEngineContainer::EvaluateAll()
 	// * ResetOnHandreset()
 	// * ResetOnNewRound()
 	// * ResetOnMyTurn()
-	if (p_handreset_detector->IsHandreset())
-	{
+	if (p_handreset_detector->IsHandreset()) 	{
 		ResetOnHandreset();
 	}
-	if (p_betround_calculator->IsNewBetround())
-	{
+	if (p_betround_calculator->IsNewBetround())	{
 		ResetOnNewRound();
 	}
-	if (p_scraper_access->IsMyTurn())
-	{
+	if (p_scraper_access->IsMyTurn()) {
 		ResetOnMyTurn();
 	}
 	// And finally ResetOnHeartbeat() gets always called.
 	ResetOnHeartbeat();
 }
 
-void CEngineContainer::ResetOnConnection()
-{
+void CEngineContainer::ResetOnConnection() {
 	write_log(preferences.debug_engine_container(), "[EngineContainer] Reset on connection\n");
 	p_autoplayer_trace->Clear();
-	for (int i=0; i<_number_of_symbol_engines_loaded; i++)
-	{
+	for (int i=0; i<_number_of_symbol_engines_loaded; i++) {
 		_symbol_engines[i]->ResetOnConnection();
 	}
 	_reset_on_connection_executed = true;
 	write_log(preferences.debug_engine_container(), "[EngineContainer] Reset on connection finished\n");
 }
 
-void CEngineContainer::ResetOnDisconnection()
-{
+void CEngineContainer::ResetOnDisconnection() {
 	write_log(preferences.debug_engine_container(), "[EngineContainer] Reset on disconnection\n");
 	// Just to make sure that our connection-code
 	// will be executed later in correct order
 	_reset_on_connection_executed = false;
 }
 
-void CEngineContainer::ResetOnHandreset()
-{
+void CEngineContainer::ResetOnHandreset() {
 	write_log(preferences.debug_engine_container(), "[EngineContainer] Reset on handreset\n");
-	for (int i=0; i<_number_of_symbol_engines_loaded; i++)
-	{
+	for (int i=0; i<_number_of_symbol_engines_loaded; i++) {
 		_symbol_engines[i]->ResetOnHandreset();
 	}
 }
 
-void CEngineContainer::ResetOnNewRound()
-{
+void CEngineContainer::ResetOnNewRound() {
 	write_log(preferences.debug_engine_container(), "[EngineContainer] Reset on new round\n");
-	for (int i=0; i<_number_of_symbol_engines_loaded; i++)
-	{
+	for (int i=0; i<_number_of_symbol_engines_loaded; i++) {
 		_symbol_engines[i]->ResetOnNewRound();
 	}
 }
@@ -362,8 +353,7 @@ void CEngineContainer::ResetOnMyTurn() {
 void CEngineContainer::ResetOnHeartbeat() {
   write_log(preferences.debug_engine_container(), "[EngineContainer] Reset on heartbeat\n");
   p_autoplayer_trace->Clear();
-  for (int i=0; i<_number_of_symbol_engines_loaded; i++)
-  {
+  for (int i=0; i<_number_of_symbol_engines_loaded; i++) {
 	  _symbol_engines[i]->ResetOnHeartbeat();
   }
 }
@@ -404,8 +394,7 @@ bool CEngineContainer::EvaluateSymbol(const char *name,
     // Don't change the result, which is a magic number
     // (ATM unused)
     return false;
-  }
-  else {
+  } else {
     // Error found during execution
     // Though we check the syntax, this can still happen
     // by gws-calls from a DLL, etc.

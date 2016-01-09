@@ -73,12 +73,14 @@ CString IntToBinaryString(int number, int min_digits /* = 1 */) {
 CString CStringRemoveLeft(CString string, int number_of_characters_to_remove) {
 	int length = string.GetLength();
 	int number_of_character_to_keep = length - number_of_characters_to_remove;
+  assert(number_of_character_to_keep >= 0);
 	return string.Right(number_of_character_to_keep);
 }
 
 CString CStringRemoveRight(CString string, int number_of_characters_to_remove) {
 	int length = string.GetLength();
 	int number_of_character_to_keep = length - number_of_characters_to_remove;
+  assert(number_of_character_to_keep >= 0);
 	return string.Left(number_of_character_to_keep);
 }
 
@@ -95,6 +97,7 @@ int  DigitCharacterToNumber(char digit) {
 char RightCharacter(CString string, int index_from_right /* = 0 */) {
   assert(index_from_right >= 0);
   int index_from_left = string.GetLength() - index_from_right - 1;
+  assert(index_from_left >= 0);
   return string[index_from_left];
 }
 

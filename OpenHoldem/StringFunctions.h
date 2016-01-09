@@ -16,6 +16,7 @@
 
 bool StringIsExactMatch(const char *string_a, const char *string_b);
 bool StringAIsPrefixOfStringB(const char *string_a, const char *string_b);
+bool StringAIsPostfixOfStringB(const char *string_a, const char *string_b);
 CString Bool2CString(bool b);
 
 // Converts any number to a CString
