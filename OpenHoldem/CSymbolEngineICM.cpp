@@ -200,7 +200,9 @@ int CSymbolEngineICM::GetChairFromDealPos(const char* name)
 		}
 		else if (strcmp(name,"D")==0)
 		{
-                 chair = sym_dealerchair;
+			for(int i =0; i<=nchairs; i++){
+				if(p_symbol_engine_poker_action->DealPosition(i)==(sym_nplayersseated))
+					chair = i;
 		}
 		else if ((strcmp(name,"CO")==0) && (sym_nplayersseated >=4))
 		{
@@ -593,9 +595,9 @@ CString CSymbolEngineICM::SymbolsProvided() {
     "icm_allitieUTG2 icm_allitieUTG3 icm_allitieUTG4 icm_allitieUTG5 "
     "icm_allitieUTG6 icm_allitieCO icm_allitieD "
     // Losing allin against a particular opponent
-    "icm_allilosSB icm_allilosBB icm_allilosUTG icm_allilosUTG1 "
-    "icm_allilosUTG2 icm_allilosUTG3 icm_allilosUTG4 icm_allilosUTG5 "
-    "icm_allilosUTG6 icm_allilosCO icm_allilosD ";
+    "icm_alliloseSB icm_alliloseBB icm_alliloseUTG icm_alliloseUTG1 "
+    "icm_alliloseUTG2 icm_alliloseUTG3 icm_alliloseUTG4 icm_alliloseUTG5 "
+    "icm_alliloseUTG6 icm_alliloseCO icm_alliloseD ";
   return result;
 }
 
